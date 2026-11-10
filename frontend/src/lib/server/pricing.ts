@@ -1,5 +1,6 @@
 // lib/server/pricing.ts
 import { COMMISSION_RATE } from '@/lib/helpers'
+import { db } from '@/lib/db'
 
 export interface QuoteInput {
   items: { productId: string; quantity: number; withStitching: boolean; size?: string }[]
@@ -21,7 +22,7 @@ export interface Quote {
 
 export async function computeQuote(input: QuoteInput): Promise<Quote> {
   // ALWAYS read prices from DB — never trust the client
-  const products = await prisma.product.findMany({
+  const products = await db.product.findMany({
     where: { id: { in: input.items.map(i => i.productId) } },
   })
 

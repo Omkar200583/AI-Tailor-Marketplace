@@ -151,7 +151,7 @@ export function SellerOrderDetails({ orderId, open, onClose, onUpdated }: {
                 <Sparkles className="w-4 h-4 text-gold-600" /> Design reference
               </h4>
               <div className="flex gap-3 bg-cream/40 rounded-2xl p-3">
-                <img src={design.imageUrl} alt={design.title} className="w-24 h-28 rounded-lg object-cover" />
+                <SmartImage src={design.imageUrl} alt={design.title} className="w-24 h-28 rounded-lg object-cover" />
                 <div className="flex-1 text-sm space-y-0.5">
                   <div className="font-semibold">{design.title}</div>
                   {design.category && <div className="text-muted-foreground">{design.category}</div>}

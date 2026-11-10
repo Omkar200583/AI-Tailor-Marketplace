@@ -564,7 +564,17 @@ export function SellerProducts({ sellerId: propSellerId }: { sellerId: string })
   function openEdit(p: Product) {
     resetProductImages()
     setEditing(p)
-    setExistingImages(p.images || [])
+    const validExistingImages = (p.images || []).filter((url) => {
+  const value = String(url)
+
+  return (
+    !value.startsWith('/uploads/') &&
+    !value.includes('localhost:3000/uploads') &&
+    !value.includes('127.0.0.1:3000/uploads')
+  )
+})
+
+setExistingImages(validExistingImages)
     const productCategory = (p as Product & { category?: string | { name?: string } }).category
     const categoryName = typeof productCategory === 'string' ? productCategory : productCategory?.name || ''
     setForm({
@@ -692,7 +702,7 @@ export function SellerProducts({ sellerId: propSellerId }: { sellerId: string })
                 <div className="mt-3 grid grid-cols-3 sm:grid-cols-5 gap-3">
                   {existingImages.map((src, index) => (
                     <div key={`existing-${index}`} className="relative aspect-square overflow-hidden rounded-xl border border-emerald-200 bg-white">
-                      <img src={src} alt={`Product ${index + 1}`} className="h-full w-full object-cover" />
+                      <SmartImage src={src} alt={`Product ${index + 1}`} className="h-full w-full object-cover" />
                       <button type="button" onClick={() => removeExistingImage(index)} className="absolute right-1.5 top-1.5 flex h-7 w-7 items-center justify-center rounded-full bg-red-600 text-white shadow hover:bg-red-700" aria-label="Remove image"><X className="h-4 w-4" /></button>
                     </div>
                   ))}
@@ -1147,7 +1157,7 @@ export function SellerProfileTab() {
             <div className="mt-3 grid grid-cols-3 gap-2.5">
               {shopPhotos.map((src, i) => (
                 <div key={`shop-${i}`} className="relative aspect-square overflow-hidden rounded-xl border border-wine-200 bg-white">
-                  <img src={src} alt={`Shop ${i + 1}`} className="h-full w-full object-cover" />
+                  <SmartImage src={src} alt={`Shop ${i + 1}`} className="h-full w-full object-cover" />
                   <button type="button" onClick={() => removeExistingShop(i)} className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-600 text-white shadow hover:bg-red-700" aria-label="Remove photo"><X className="h-3.5 w-3.5" /></button>
                 </div>
               ))}

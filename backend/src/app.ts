@@ -4,7 +4,6 @@ import helmet from "helmet";
 import morgan from "morgan";
 import compression from "compression";
 import cookieParser from "cookie-parser";
-import path from "path";
 
 import { env } from "./config/env";
 import api from "./modules";
@@ -50,10 +49,8 @@ app.use(
 
 app.use(express.urlencoded({ extended: true }));
 
-app.use(
-  "/uploads",
-  express.static(path.join(process.cwd(), "uploads"))
-);
+// NOTE: /uploads static route removed — images now served from Cloudinary.
+// Cloudinary URLs are absolute https URLs stored directly in MongoDB.
 
 app.get("/", (_req, res) => {
   res.status(200).json({

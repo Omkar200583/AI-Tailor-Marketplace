@@ -3,7 +3,7 @@ import { asyncHandler } from "../../utils/asyncHandler";
 import { ok, created } from "../../utils/ApiResponse";
 import { ApiError } from "../../utils/ApiError";
 import { toPoint } from "../../utils/mongo";
-import { fileUrl } from "../../middleware/upload";
+import { uploadToCloudinary, uploadMany } from "../../middleware/upload";
 import { User } from "./user.model";
 import { Address } from "./address.model";
 import { UserPhoto } from "./userPhoto.model";
@@ -18,9 +18,11 @@ export const updateProfile = asyncHandler(async (req: Request, res: Response) =>
   ok(res, user, "Profile updated");
 });
 
+// ✅ Profile image → Cloudinary (was: fileUrl(req.file.filename))
 export const uploadProfileImage = asyncHandler(async (req: Request, res: Response) => {
   if (!req.file) throw ApiError.badRequest("Image file is required (field: image)");
-  const user = await User.findByIdAndUpdate(req.user!.id, { profileImage: fileUrl(req.file.filename) }, { new: true });
+  const { url } = await uploadToCloudinary(req.file, "ai-tailor/avatars");
+  const user = await User.findByIdAndUpdate(req.user!.id, { profileImage: url }, { new: true });
   ok(res, user, "Profile image updated");
 });
 
@@ -60,12 +62,17 @@ export const deleteAddress = asyncHandler(async (req, res) => {
 });
 
 // ---- Photos (for try-on / measurements) ----
+// ✅ Photos → Cloudinary (was: fileUrl(f.filename))
 export const uploadPhotos = asyncHandler(async (req, res) => {
   const files = (req.files as Express.Multer.File[]) || [];
   if (!files.length) throw ApiError.badRequest("At least one image is required (field: photos)");
+  const uploaded = await uploadMany(files, "ai-tailor/user-photos");
   const docs = await UserPhoto.insertMany(
-    files.map((f) => ({
-      userId: req.user!.id, url: fileUrl(f.filename), mimeType: f.mimetype, size: f.size,
+    uploaded.map((u, i) => ({
+      userId: req.user!.id,
+      url: u.url,
+      mimeType: files[i].mimetype,
+      size: files[i].size,
       type: req.body.type || "full_body",
     }))
   );

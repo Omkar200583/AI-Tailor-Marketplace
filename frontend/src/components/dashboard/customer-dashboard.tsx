@@ -96,14 +96,14 @@ function SellerPickerDialog({ open, onClose, onPick }: {
   )
 }
 
-// Full-size design preview modal
+// Full-size design preview modal — uses SmartImage to guard /uploads/ URLs
 function DesignPreviewModal({ design, onClose }: { design: Design | null; onClose: () => void }) {
   if (!design) return null
   return (
     <Dialog open={!!design} onOpenChange={onClose}>
       <DialogContent className="sm:max-w-lg p-0 overflow-hidden">
         <div className="aspect-[3/4] bg-cream-dark">
-          <img src={design.imageUrl} alt={design.title} className="w-full h-full object-contain" />
+          <SmartImage src={design.imageUrl} alt={design.title} className="w-full h-full object-contain" />
         </div>
         <div className="p-5 space-y-2">
           <div className="font-display font-bold text-lg text-wine-900">{design.title}</div>
@@ -129,7 +129,7 @@ function DesignPreviewModal({ design, onClose }: { design: Design | null; onClos
   )
 }
 
-// Try-on before/after preview modal
+// Try-on before/after preview modal — uses SmartImage to guard /uploads/ URLs
 function TryonPreviewModal({ session, onClose }: { session: TryonSession | null; onClose: () => void }) {
   if (!session) return null
   return (
@@ -143,13 +143,13 @@ function TryonPreviewModal({ session, onClose }: { session: TryonSession | null;
           <div>
             <div className="text-[10px] font-semibold text-muted-foreground mb-1.5 uppercase tracking-wide">Original Product</div>
             <div className="aspect-[3/4] bg-cream-dark rounded-xl overflow-hidden">
-              <img src={session.productImage} alt="Original" className="w-full h-full object-cover" />
+              <SmartImage src={session.productImage} alt="Original" className="w-full h-full object-cover" />
             </div>
           </div>
           <div>
             <div className="text-[10px] font-semibold text-gold-700 mb-1.5 uppercase tracking-wide">Try-On Result</div>
             <div className="aspect-[3/4] bg-cream-dark rounded-xl overflow-hidden ring-2 ring-gold-300">
-              <img src={session.resultImage} alt="Try-on result" className="w-full h-full object-cover" />
+              <SmartImage src={session.resultImage} alt="Try-on result" className="w-full h-full object-cover" />
             </div>
           </div>
         </div>
@@ -158,7 +158,6 @@ function TryonPreviewModal({ session, onClose }: { session: TryonSession | null;
   )
 }
 
-// ═══════════════ Orders list (customer) ═══════════════
 // ═══════════════ Orders list (customer) ═══════════════
 export function CustomerOrders() {
   const [orders, setOrders] = useState<Order[]>([])
@@ -876,7 +875,7 @@ export function DesignsTab() {
           </DialogHeader>
           {deleteDesign && (
             <div className="flex gap-3 items-center bg-cream/40 rounded-2xl p-3">
-              <img src={deleteDesign.imageUrl} alt={deleteDesign.title} className="w-16 h-20 rounded-lg object-cover" />
+              <SmartImage src={deleteDesign.imageUrl} alt={deleteDesign.title} className="w-16 h-20 rounded-lg object-cover" />
               <div className="text-xs">
                 <div className="font-semibold">{deleteDesign.title}</div>
                 <div className="text-muted-foreground">{deleteDesign.category} · {timeAgo(deleteDesign.createdAt)}</div>
@@ -1024,7 +1023,7 @@ export function TryonHistoryTab() {
           </DialogHeader>
           {deleteSession && (
             <div className="flex gap-3 items-center bg-cream/40 rounded-2xl p-3">
-              <img src={deleteSession.resultImage} alt={deleteSession.productName} className="w-16 h-20 rounded-lg object-cover" />
+              <SmartImage src={deleteSession.resultImage} alt={deleteSession.productName} className="w-16 h-20 rounded-lg object-cover" />
               <div className="text-xs">
                 <div className="font-semibold line-clamp-2">{deleteSession.productName}</div>
                 <div className="text-muted-foreground">{timeAgo(deleteSession.createdAt)}</div>

@@ -125,7 +125,7 @@ export function ProductDetailView({ productId }: { productId: string }) {
                   onClick={() => setActiveImage(i)}
                   className={cn('w-16 h-20 rounded-lg overflow-hidden border-2 shrink-0', activeImage === i ? 'border-wine-700' : 'border-wine-100')}
                 >
-                  <img src={img} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" />
+                  <SmartImage src={img} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
