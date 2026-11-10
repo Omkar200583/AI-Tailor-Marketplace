@@ -42,3 +42,13 @@ async def engine_error_handler(_: Request, exc: AIEngineError):
 async def unhandled(_: Request, exc: Exception):
     log.exception("Unhandled error")
     return JSONResponse(status_code=500, content={"error": "internal_error", "message": "Something went wrong"})
+
+
+@app.get("/")
+async def root():
+    return {
+        "success": True,
+        "service": "AI Tailor Engine",
+        "status": "running",
+        "message": "AI Engine is online"
+    }
