@@ -1,9 +1,29 @@
+
 "use client";
 
 type ApiOptions = {
   method?: string;
   body?: unknown;
 };
+
+export class ApiError extends Error {
+  status: number;
+  details?: string;
+  code?: string;
+
+  constructor(
+    message: string,
+    status: number,
+    details?: string,
+    code?: string
+  ) {
+    super(message);
+    this.name = "ApiError";
+    this.status = status;
+    this.details = details;
+    this.code = code;
+  }
+}
 
 export async function api<T = unknown>(
   path: string,
@@ -37,14 +57,18 @@ export async function api<T = unknown>(
     const errorData = data as {
       error?: string;
       message?: string;
+      details?: string;
+      code?: string;
     };
 
-    throw new Error(
-      errorData.message ||
-      errorData.error ||
-      `Request failed (${res.status})`
+    throw new ApiError(
+      errorData.message || errorData.error || `Request failed (${res.status})`,
+      res.status,
+      errorData.details,
+      errorData.code
     );
   }
 
   return data as T;
 }
+

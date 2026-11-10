@@ -58,28 +58,71 @@ export function AIStudioView() {
   }, [user])
 
   useEffect(() => {
-    if (!generating) { setStage(0); return }
+    if (!generating) return
     const t = setInterval(() => setStage((s) => (s + 1) % stages.length), 1800)
     return () => clearInterval(t)
-     
+
   }, [generating])
 
   async function generate() {
-    if (!user) { useAppStore.getState().setAuthOpen(true); return }
-    if (!prompt.trim()) { toast({ title: 'Describe your outfit first ✍️', variant: 'destructive' }); return }
-    setGenerating(true)
-    setCurrent(null)
-    try {
-      const d = await api<{ design: Design }>('/designs', { method: 'POST', body: { prompt, category, fabric, colors } })
-      setCurrent(d.design)
-      setHistory((h) => [d.design, ...h])
-      toast({ title: 'Design ready! ✨', description: 'Save it or send it straight to a tailor.' })
-    } catch (e) {
-      toast({ title: (e as Error).message, variant: 'destructive' })
-    } finally {
-      setGenerating(false)
-    }
+  if (!user) {
+    useAppStore.getState().setAuthOpen(true);
+    return;
   }
+
+  if (!prompt.trim()) {
+    toast({
+      title: "Describe your outfit first",
+      variant: "destructive",
+    });
+    return;
+  }
+
+  setStage(0);
+  setGenerating(true);
+  setCurrent(null);
+
+  try {
+    const d = await api<{ design: Design }>("/designs", {
+      method: "POST",
+      body: { prompt, category, fabric, colors },
+    });
+
+    setCurrent(d.design);
+    setHistory((h) => [d.design, ...h]);
+
+    toast({
+      title: "Design ready!",
+      description: "Save it or send it straight to a tailor.",
+    });
+  } catch (e) {
+    const error = e as Error & {
+      status?: number;
+      details?: string;
+      code?: string;
+    };
+
+    console.error("AI Design Generation Error:", {
+      message: error.message,
+      status: error.status,
+      code: error.code,
+      details: error.details,
+      error,
+    });
+
+    toast({
+      title: error.message || "Design generation failed",
+      description: [
+        error.status ? `Status: ${error.status}` : "",
+        error.code || "",
+        error.details || "",
+      ].filter(Boolean).join(" | "),
+      variant: "destructive",
+    });
+  } finally {
+    setGenerating(false);
+  }
+}
 
   async function sendToTailor(designId: string, sellerId: string) {
     setSendingTo(sellerId)

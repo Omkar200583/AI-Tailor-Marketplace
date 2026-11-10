@@ -42,8 +42,13 @@ def _generate_sync(prompt: str) -> bytes:
     )
 
     try:
+        logger.info("Sending image generation request to Cloudflare")
+
         with urllib.request.urlopen(request, timeout=180) as response:
+            logger.info("Cloudflare response status: %s", response.status)
             result = json.loads(response.read().decode("utf-8"))
+
+        logger.info("Cloudflare response received")
 
         if not result.get("success", False):
             raise RuntimeError(
@@ -60,15 +65,21 @@ def _generate_sync(prompt: str) -> bytes:
         if not image_bytes:
             raise RuntimeError("Generated image is empty")
 
+        logger.info("Cloudflare image decoded successfully: %s bytes", len(image_bytes))
+
         return image_bytes
 
     except urllib.error.HTTPError as exc:
         error_body = exc.read().decode("utf-8", errors="replace")
+        logger.error("Cloudflare HTTP error %s: %s", exc.code, error_body)
+
         raise RuntimeError(
             f"Cloudflare HTTP {exc.code}: {error_body}"
         ) from exc
 
     except urllib.error.URLError as exc:
+        logger.exception("Cloudflare connection failed")
+
         raise RuntimeError(
             f"Cloudflare connection failed: {exc.reason}"
         ) from exc

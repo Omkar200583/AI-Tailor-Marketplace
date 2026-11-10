@@ -1,3 +1,4 @@
+import asyncio
 import json
 import logging
 
@@ -13,22 +14,51 @@ STYLE_SUFFIX = (
 
 
 async def base_description(user_prompt: str) -> str:
-    """Use the LLM to translate/clean the user's idea; fall back to the raw prompt."""
     try:
-        raw = await llm_model.generate(
-            [{"role": "system", "content": DESIGN_REWRITE_SYSTEM}, {"role": "user", "content": user_prompt}],
-            json_mode=True,
-            temperature=0.2,
+        log.info("Starting AI prompt rewrite")
+
+        raw = await asyncio.wait_for(
+            llm_model.generate(
+                [
+                    {"role": "system", "content": DESIGN_REWRITE_SYSTEM},
+                    {"role": "user", "content": user_prompt}
+                ],
+                json_mode=True,
+                temperature=0.2,
+            ),
+            timeout=20
         )
-        d = json.loads(raw)
-        return f"{d.get('colors', '')} {d.get('garment', '')}, {d.get('details', '')}".strip(" ,")
-    except Exception as exc:  # LLM is optional here
-        log.warning("Prompt rewrite skipped: %s", exc)
+
+        data = json.loads(raw)
+
+        description = (
+            f"{data.get('colors', '')} "
+            f"{data.get('garment', '')}, "
+            f"{data.get('details', '')}"
+        ).strip(" ,")
+
+        if description:
+            log.info("AI prompt rewrite completed")
+            return description
+
+        log.warning("AI returned an empty description; using original prompt")
+        return user_prompt
+
+    except Exception:
+        log.exception("AI prompt rewrite failed; using original prompt")
         return user_prompt
 
 
 def build_variation_prompts(base: str, n: int) -> list[tuple[str, str]]:
-    out = []
+    output = []
+
     for label, collar, sleeve in VARIATIONS[:n]:
-        out.append((label, f"{base}, {collar}, {sleeve}, traditional Indian tailoring, {STYLE_SUFFIX}"))
-    return out
+        prompt = (
+            f"{base}, {collar}, {sleeve}, "
+            f"traditional Indian tailoring, {STYLE_SUFFIX}"
+        )
+        output.append((label, prompt))
+
+    log.info("Created %s design variation prompts", len(output))
+
+    return output
