@@ -1,0 +1,44 @@
+// Add the `portfolio` column to your SellerProfile model.
+//
+// This file is just a snippet — copy the `portfolio` line below into your
+// existing `model SellerProfile` in prisma/schema.prisma and then run:
+//
+//   npx prisma migrate dev --name add_seller_portfolio
+//   npx prisma generate
+//
+
+model SellerProfile {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  shopName        String
+  description     String?  @db.Text
+  contactNumber   String?
+  whatsappNumber  String?
+  address         String
+  city            String?
+  lat             Float?
+  lng             Float?
+  specialization  String?
+  experienceYears Int      @default(0)
+  availability    String?
+  services        String   @default("[]") @db.Text   // JSON array of strings
+
+  // ───────────────────────────────────────────────────────────────
+  // NEW: JSON-encoded array of public image URLs for the shop gallery.
+  // Stored as a text column to mirror the existing `services` pattern.
+  portfolio       String   @default("[]") @db.Text
+  // ───────────────────────────────────────────────────────────────
+
+  rating          Float    @default(0)
+  ratingCount     Int      @default(0)
+  verificationStatus String @default("PENDING")
+  verificationNote String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  products        Product[]
+
+  @@index([city])
+  @@index([verificationStatus])
+}

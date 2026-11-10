@@ -1,0 +1,300 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+}
+
+/*
+ * Brand palette. Declared in a NON-inline @theme so utilities compile to
+ * var(--color-wine-700) etc. This lets each portal (.theme-seller, .theme-admin)
+ * re-map the palette without touching any component class names.
+ */
+@theme {
+  --color-wine-50: #FBF3F4;
+  --color-wine-100: #F5E1E3;
+  --color-wine-200: #E9C3C8;
+  --color-wine-300: #D69AA4;
+  --color-wine-400: #BC6B7C;
+  --color-wine-500: #A04A5F;
+  --color-wine-600: #8A3550;
+  --color-wine-700: #7C2D3E;
+  --color-wine-800: #5E2331;
+  --color-wine-900: #451925;
+  --color-gold-50: #FDFAF1;
+  --color-gold-100: #FAF0D7;
+  --color-gold-200: #F3DFAC;
+  --color-gold-300: #EAC877;
+  --color-gold-400: #E0AE48;
+  --color-gold-500: #D69A28;
+  --color-gold-600: #C0821F;
+  --color-gold-700: #A0641C;
+  --color-gold-800: #83501F;
+  --color-gold-900: #6C421E;
+  --color-cream: #FAF7F2;
+  --color-cream-dark: #F3EDE3;
+}
+
+:root {
+  --radius: 0.75rem;
+  --background: #FAF7F2;
+  --foreground: #2B1B20;
+  --card: #FFFFFF;
+  --card-foreground: #2B1B20;
+  --popover: #FFFFFF;
+  --popover-foreground: #2B1B20;
+  --primary: #7C2D3E;
+  --primary-foreground: #FFF8F5;
+  --secondary: #F3EDE3;
+  --secondary-foreground: #451925;
+  --muted: #F3EDE3;
+  --muted-foreground: #8A6F76;
+  --accent: #FDF4E7;
+  --accent-foreground: #A0641C;
+  --destructive: #C03535;
+  --border: #EADFDC;
+  --input: #EADFDC;
+  --ring: #C0821F;
+  --chart-1: #7C2D3E;
+  --chart-2: #D69A28;
+  --chart-3: #0F766E;
+  --chart-4: #9D174D;
+  --chart-5: #B45309;
+  --sidebar: #2B1420;
+  --sidebar-foreground: #EADFDA;
+  --sidebar-primary: #D69A28;
+  --sidebar-primary-foreground: #2B1420;
+  --sidebar-accent: #47222F;
+  --sidebar-accent-foreground: #F5E1E3;
+  --sidebar-border: #3E1E2B;
+  --sidebar-ring: #D69A28;
+}
+
+.dark {
+  --background: #1E1015;
+  --foreground: #F5EDEA;
+  --card: #2B171F;
+  --card-foreground: #F5EDEA;
+  --popover: #2B171F;
+  --popover-foreground: #F5EDEA;
+  --primary: #D69A7C;
+  --primary-foreground: #2B1420;
+  --secondary: #3A2029;
+  --secondary-foreground: #F5EDEA;
+  --muted: #3A2029;
+  --muted-foreground: #B59AA2;
+  --accent: #3A2029;
+  --accent-foreground: #EAC877;
+  --destructive: #E05B5B;
+  --border: #472730;
+  --input: #472730;
+  --ring: #D69A28;
+  --chart-1: #D69A7C;
+  --chart-2: #EAC877;
+  --chart-3: #2DD4BF;
+  --chart-4: #F472B6;
+  --chart-5: #FB923C;
+  --sidebar: #1A0E12;
+  --sidebar-foreground: #EADFDA;
+  --sidebar-primary: #D69A28;
+  --sidebar-primary-foreground: #1A0E12;
+  --sidebar-accent: #331C24;
+  --sidebar-accent-foreground: #F5E1E3;
+  --sidebar-border: #331C24;
+  --sidebar-ring: #D69A28;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    background-image:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(214, 154, 40, 0.06), transparent),
+      radial-gradient(ellipse 60% 40% at 100% 0%, rgba(124, 45, 62, 0.05), transparent);
+  }
+}
+
+.font-display {
+  font-family: Georgia, 'Times New Roman', 'Noto Serif', serif;
+  letter-spacing: -0.01em;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #D9C6C0; border-radius: 8px; }
+::-webkit-scrollbar-thumb:hover { background: #BC6B7C; }
+
+/* Marquee animation for the landing ticker */
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-marquee { animation: marquee 28s linear infinite; }
+
+/* Shimmer for skeletons */
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+.shimmer {
+  background: linear-gradient(90deg, #F3EDE3 25%, #FAF7F2 50%, #F3EDE3 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.6s infinite linear;
+}
+
+/* Floating blobs for hero */
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-18px) scale(1.04); }
+}
+.animate-float-slow { animation: float-slow 7s ease-in-out infinite; }
+.animate-float-slower { animation: float-slow 10s ease-in-out infinite; }
+
+/* Typing dots */
+@keyframes typing-dot {
+  0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
+  30% { transform: translateY(-4px); opacity: 1; }
+}
+.typing-dot { animation: typing-dot 1.2s infinite; }
+.typing-dot:nth-child(2) { animation-delay: 0.15s; }
+.typing-dot:nth-child(3) { animation-delay: 0.3s; }
+
+/* Paisley pattern background utility */
+.paisley-bg {
+  background-image: radial-gradient(circle at 25px 25px, rgba(124, 45, 62, 0.05) 2px, transparent 2px);
+  background-size: 50px 50px;
+}
+
+
+/* ═══════════════════════════════════════════════════════════════
+ * PORTAL THEMES
+ * Customer = default (wine & gold, fashion boutique)
+ * Seller   = emerald & amber (business / workshop)
+ * Admin    = indigo & slate (SaaS control room)
+ * Applied on the portal wrapper AND on <body> (for Radix portals).
+ * ═══════════════════════════════════════════════════════════════ */
+.theme-seller {
+  --color-wine-50: #F0FDF7; --color-wine-100: #D5F5E6; --color-wine-200: #AAEBCD;
+  --color-wine-300: #6FD9AA; --color-wine-400: #38C185; --color-wine-500: #1FA56B;
+  --color-wine-600: #178856; --color-wine-700: #136F47; --color-wine-800: #0F5738;
+  --color-wine-900: #0B3F29;
+  --color-cream: #F4FAF7; --color-cream-dark: #E6F1EB;
+  --background: #F4FAF7; --foreground: #10231A;
+  --primary: #136F47; --primary-foreground: #F0FDF7;
+  --secondary: #E6F1EB; --secondary-foreground: #0B3F29;
+  --muted: #E6F1EB; --muted-foreground: #5B7A6B;
+  --accent: #ECF8F1; --accent-foreground: #0F5738;
+  --border: #D5E6DC; --input: #D5E6DC; --ring: #1FA56B;
+  --chart-1: #136F47; --chart-2: #D69A28; --chart-3: #0F766E; --chart-4: #38C185; --chart-5: #B45309;
+  --sidebar: #0B2A1D; --sidebar-foreground: #D7EADF;
+  --sidebar-primary: #E0AE48; --sidebar-primary-foreground: #0B2A1D;
+  --sidebar-accent: #14402C; --sidebar-accent-foreground: #D5F5E6;
+  --sidebar-border: #123826; --sidebar-ring: #E0AE48;
+}
+
+.theme-admin {
+  --color-wine-50: #F3F4FF; --color-wine-100: #E3E6FD; --color-wine-200: #C7CCFA;
+  --color-wine-300: #A2A9F4; --color-wine-400: #7B82EA; --color-wine-500: #5B5FDC;
+  --color-wine-600: #4A47C4; --color-wine-700: #3F3BA8; --color-wine-800: #322F85;
+  --color-wine-900: #25235F;
+  --color-gold-50: #F0F9FF; --color-gold-100: #E0F2FE; --color-gold-200: #BAE6FD;
+  --color-gold-300: #7DD3FC; --color-gold-400: #38BDF8; --color-gold-500: #0EA5E9;
+  --color-gold-600: #0284C7; --color-gold-700: #0369A1; --color-gold-800: #075985;
+  --color-gold-900: #0C4A6E;
+  --color-cream: #F4F5F9; --color-cream-dark: #E9EBF3;
+  --background: #F4F5F9; --foreground: #111827;
+  --primary: #3F3BA8; --primary-foreground: #F3F4FF;
+  --secondary: #E9EBF3; --secondary-foreground: #25235F;
+  --muted: #EEF0F6; --muted-foreground: #64748B;
+  --accent: #EEF0FF; --accent-foreground: #322F85;
+  --border: #E2E5EF; --input: #E2E5EF; --ring: #5B5FDC;
+  --chart-1: #3F3BA8; --chart-2: #0EA5E9; --chart-3: #0F766E; --chart-4: #7B82EA; --chart-5: #B45309;
+  --sidebar: #0F172A; --sidebar-foreground: #CBD5E1;
+  --sidebar-primary: #7B82EA; --sidebar-primary-foreground: #0F172A;
+  --sidebar-accent: #1E293B; --sidebar-accent-foreground: #E3E6FD;
+  --sidebar-border: #1E293B; --sidebar-ring: #7B82EA;
+}
+
+.theme-seller, .theme-admin { background-color: var(--background); color: var(--foreground); }
+
+/* Explore products - smooth left-to-right marquee */
+
+.products-marquee-viewport {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.products-marquee-viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.products-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: products-marquee 38s linear infinite;
+}
+
+.products-marquee-viewport:hover .products-marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes products-marquee {
+  from {
+    transform: translateX(-50%);
+  }
+
+  to {
+    transform: translateX(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .products-marquee-track {
+    animation: none;
+  }
+}
