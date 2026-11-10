@@ -1,0 +1,16 @@
+{
+  "mode": "DRY RUN",
+  "generatedAt": "2026-11-10T06:14:59.103Z",
+  "localFilesFound": [
+    "96e4cc4a-0aa2-4ae8-8944-229e9c699e3b.jpg",
+    "ec56db75-86ea-4021-b172-773d2bc31f4b.jpg",
+    "5993179e-d254-472e-bc3b-58a9cc70011f.jpg",
+    "fa136502-5851-450a-8c44-90eb6d594fba.jpg",
+    "07989334-49b8-4e73-8c38-6bd3c095bf80.jpg",
+    "4322d0e2-54ce-449b-98a0-7106ee9121db.jpg",
+    "68137fcf-beb6-4229-b7a3-ebeee6b3c724.jpg"
+  ],
+  "missingFiles": [],
+  "failures": [],
+  "plannedUpdates": []
+}
