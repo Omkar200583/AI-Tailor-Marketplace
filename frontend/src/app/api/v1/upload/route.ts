@@ -1,84 +1,106 @@
 import { getSessionUser, requireAuth, json } from '@/lib/auth'
-import { writeFile, mkdir } from 'fs/promises'
-import { existsSync } from 'fs'
-import path from 'path'
-import { randomUUID } from 'crypto'
+import { v2 as cloudinary } from 'cloudinary'
+import { Readable } from 'node:stream'
+import { randomUUID } from 'node:crypto'
 
-// Allowed MIME types and max size per image
+export const runtime = 'nodejs'
+
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
-const MAX_SIZE = 5 * 1024 * 1024 // 5 MB
+const MAX_SIZE = 5 * 1024 * 1024
 const MAX_FILES = 8
 
-const EXT_BY_TYPE: Record<string, string> = {
-  'image/jpeg': 'jpg',
-  'image/png': 'png',
-  'image/webp': 'webp',
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+})
+
+async function uploadToCloudinary(buffer: Buffer, filename: string) {
+  return new Promise<string>((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      {
+        folder: 'ai-tailor/products',
+        public_id: filename,
+        resource_type: 'image',
+      },
+      (error, result) => {
+        if (error || !result) {
+          reject(error || new Error('Cloudinary upload failed'))
+          return
+        }
+
+        resolve(result.secure_url)
+      },
+    )
+
+    Readable.from(buffer).pipe(stream)
+  })
 }
 
-// POST /api/v1/upload
-// Accepts multipart/form-data with field `files` (one or more).
-// Returns { urls: string[] } of publicly accessible image paths.
 export async function POST(req: Request) {
   const user = await getSessionUser()
- const denied = requireAuth(user, ['CUSTOMER', 'SELLER', 'DESIGNER', 'ADMIN'])
+
+  const denied = requireAuth(user, [
+    'CUSTOMER',
+    'SELLER',
+    'DESIGNER',
+    'ADMIN',
+  ])
+
   if (denied) return denied
 
+  if (
+    !process.env.CLOUDINARY_CLOUD_NAME ||
+    !process.env.CLOUDINARY_API_KEY ||
+    !process.env.CLOUDINARY_API_SECRET
+  ) {
+    return json({ error: 'Cloudinary configuration is missing' }, 500)
+  }
+
   let formData: FormData
+
   try {
     formData = await req.formData()
   } catch {
     return json({ error: 'Invalid multipart form data' }, 400)
   }
 
-  const files = formData.getAll('files').filter((f): f is File => f instanceof File && f.size > 0)
+  const files = formData
+    .getAll('files')
+    .filter((file): file is File => file instanceof File && file.size > 0)
 
   if (files.length === 0) {
     return json({ error: 'No files provided' }, 400)
   }
 
   if (files.length > MAX_FILES) {
-    return json({ error: `You can upload at most ${MAX_FILES} files at once.` }, 400)
+    return json({ error: `Maximum ${MAX_FILES} files allowed` }, 400)
   }
 
-  // Validate every file first — fail fast before writing anything to disk.
   for (const file of files) {
     if (!ALLOWED_TYPES.includes(file.type)) {
-      return json(
-        { error: `File "${file.name}" has unsupported type (${file.type || 'unknown'}). Allowed: JPG, PNG, WEBP.` },
-        400,
-      )
+      return json({ error: `Unsupported image type: ${file.type}` }, 400)
     }
+
     if (file.size > MAX_SIZE) {
-      return json({ error: `File "${file.name}" is too large. Maximum 5 MB per image.` }, 400)
+      return json({ error: `${file.name} exceeds the 5 MB limit` }, 400)
     }
   }
-
-  const uploadDir = path.join(process.cwd(), 'public', 'uploads')
-  try {
-    if (!existsSync(uploadDir)) {
-      await mkdir(uploadDir, { recursive: true })
-    }
-  } catch (e) {
-    console.error('upload mkdir error', e)
-    return json({ error: 'Server could not prepare upload directory' }, 500)
-  }
-
-  const urls: string[] = []
 
   try {
-    for (const file of files) {
-      const ext = EXT_BY_TYPE[file.type] || 'jpg'
-      const filename = `${randomUUID()}.${ext}`
-      const filepath = path.join(uploadDir, filename)
-      const buffer = Buffer.from(await file.arrayBuffer())
-      await writeFile(filepath, buffer)
-      // Public URL path (served by Next.js from /public)
-      urls.push(`/uploads/${filename}`)
-    }
-  } catch (e) {
-    console.error('upload write error', e)
-    return json({ error: 'Failed to save one or more files' }, 500)
-  }
+    const urls = await Promise.all(
+      files.map(async (file) => {
+        const buffer = Buffer.from(await file.arrayBuffer())
+        const filename = randomUUID()
 
-  return json({ urls }, 201)
+        return uploadToCloudinary(buffer, filename)
+      }),
+    )
+
+    return json({ urls }, 201)
+  } catch (error) {
+    console.error('Cloudinary upload error:', error)
+
+    return json({ error: 'Failed to upload images' }, 500)
+  }
 }
